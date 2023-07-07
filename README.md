@@ -8,6 +8,8 @@
 
 ## Example
 
+> from_str
+
 ```rust
 use std::str::FromStr;
 use jkcenum_derive::JkcEnum;
@@ -35,6 +37,8 @@ fn test_fromstr() {
 }
 ```
 
+> to_string
+
 ```rust
 use jkcenum_derive::JkcEnum;
 
@@ -51,5 +55,28 @@ enum JkcExample {
 fn test_tostring() {
     assert_eq!(JkcExample::Read.to_string(), "Read");
     assert_eq!(JkcExample::Write.to_string(), "WRITE");
+}
+```
+
+> to_vec
+
+```rust
+use jkcenum_derive::JkcEnum;
+
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, JkcEnum)]
+pub enum JkcExample {
+    Read,
+    #[jenum(rename = "WRITE")]
+    Write,
+}
+
+
+#[test]
+fn test_to_vec() {
+    assert_eq!(JkcExample::to_vec(), vec![
+        JkcExample::Read,
+        JkcExample::Write,
+    ]);
 }
 ```
