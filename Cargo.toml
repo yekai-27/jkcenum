@@ -1,0 +1,19 @@
+[package]
+name = "jkcenum"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = [
+    "derive"
+]
+
+[features]
+default = ["derive"]
+derive = ["jkcenum_derive"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+jkcenum_derive = { path = "derive", version = "0.1.0", optional = true }
+thiserror = "*"
