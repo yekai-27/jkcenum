@@ -24,6 +24,7 @@ impl DeriveEnum {
         self.generate_enum_to_string(generator)?;
         self.generate_enum_from_str(generator)?;
         self.generate_enum_to_vec(generator)?;
+        self.generate_enum_from_int(generator)?;
 
         Ok(())
     }
@@ -118,6 +119,50 @@ impl DeriveEnum {
                     }
 
                     variant_case.push_parsed("_ => Err(Self::Err::InvalidStr(s.to_string()))")?;
+
+                    Ok(())
+                })?;
+
+                Ok(())
+            })?;
+
+        Ok(())
+    }
+
+    pub fn generate_enum_from_int(&self, generator: &mut Generator) -> Result<()> {
+        let mut generator = generator.impl_for("jkcenum::FromInt");
+            generator.impl_type("Err", "jkcenum::errors::FromIntParseError")?;
+            generator.generate_fn("from_int")
+            .with_arg("v", "isize")
+            .with_return_type("Result<Self, Self::Err>")
+            .body(|fn_builder| {
+                fn_builder.push_parsed("match v")?;
+
+                fn_builder.group(Delimiter::Brace, |variant_case| {
+                    let mut default = false;
+
+                    for (variant_index, variant) in self.iter_fields() {
+                        let attributes = variant.attributes.get_attribute::<FieldAttributes>()?.unwrap_or_default();
+
+                        if attributes.default {
+                            variant_case.push_parsed("_")?;
+                            default = true;
+                        }
+                        else if let Some((start, end)) = attributes.range {
+                            variant_case.push_parsed(format!("{start}..={end}"))?;
+                        }
+                        else {
+                            variant_case.push_parsed(format!("{}", variant_index.to_string().replace("isize", "")))?;
+                        }
+
+                        variant_case.puncts("=>");
+
+                        variant_case.push_parsed(format!("Ok(Self::{}),", &variant.name))?;
+                    }
+
+                    if !default {
+                        variant_case.push_parsed("_ => Err(Self::Err::InvalidInt(v))")?;
+                    }
 
                     Ok(())
                 })?;

@@ -70,6 +70,8 @@ impl FromAttribute for ContainerAttributes {
 pub struct FieldAttributes {
     pub rename: Option<String>,
     pub alias: Vec<String>,
+    pub range: Option<(usize, usize)>,
+    pub default: bool,
 }
 
 
@@ -86,13 +88,28 @@ impl FromAttribute for FieldAttributes {
             match attribute {
                 ParsedAttribute::Tag(i) => {
                     // #xxx[xxx]
-                    return Err(Error::custom_at("Unknown field attribute", i.span()));
+                    match i.to_string().as_str() {
+                        "default" => result.default = true,
+                        _ => return Err(Error::custom_at("Unknown field attribute", i.span())),
+                    }
                 }
                 ParsedAttribute::Property(key, val) => {
                     // #xxx[xxx=xxx]
                     match key.to_string().as_str() {
                         "rename" => result.rename = Some(parse_value_string(&val)?),
                         "alias" => result.alias.push(val.to_string()),
+                        "range" => {
+                            let value = parse_value_string(&val)?;
+
+                            let mut v_split = value.split("..");
+
+                            if let Some(v1) = v_split.next() && let Some(v2) = v_split.next() {
+                                result.range = Some((v1.parse::<usize>().unwrap(), v2.parse::<usize>().unwrap()))
+                            }
+                            else {
+                                return Err(Error::custom_at("Unknown field attribute", key.span()));
+                            }
+                        },
                         _ => {
                             return Err(Error::custom_at("Unknown field attribute", key.span()));
                         }
