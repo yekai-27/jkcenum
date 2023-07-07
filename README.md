@@ -2,8 +2,9 @@
 
 ## Feature
 
-- [x] to_string
 - [x] from_str
+- [x] from_int
+- [x] to_string
 - [x] to_vec
 
 ## Example
@@ -34,6 +35,39 @@ fn test_fromstr() {
     assert_eq!(JkcExample::from_str("w").unwrap(), JkcExample::Write);
     assert_eq!(JkcExample::from_str("write").unwrap(), JkcExample::Write);
     assert_eq!(JkcExample::from_str("Write").is_err(), true);
+}
+```
+
+> from_int
+
+```rust
+use jkcenum_derive::JkcEnum;
+use jkcenum::FromInt;
+
+
+#[derive(Debug, PartialEq, Eq, JkcEnum)]
+pub enum JkcExample {
+    Read = 0x01,
+    ReadWrite,
+    Write = 0x03,
+    #[jenum(range="4..6")]
+    Test,
+    Test2 = 7,
+    #[jenum(default)]
+    Unknown,
+}
+
+#[test]
+fn test_fromint() {
+    assert_eq!(JkcExample::from_int(1).unwrap(), JkcExample::Read);
+    assert_eq!(JkcExample::from_int(2).unwrap(), JkcExample::ReadWrite);
+    assert_eq!(JkcExample::from_int(3).unwrap(), JkcExample::Write);
+    assert_eq!(JkcExample::from_int(4).unwrap(), JkcExample::Test);
+    assert_eq!(JkcExample::from_int(5).unwrap(), JkcExample::Test);
+    assert_eq!(JkcExample::from_int(6).unwrap(), JkcExample::Test);
+    assert_eq!(JkcExample::from_int(7).unwrap(), JkcExample::Test2);
+    assert_eq!(JkcExample::from_int(8).unwrap(), JkcExample::Unknown);
+    assert_eq!(JkcExample::from_int(9).unwrap(), JkcExample::Unknown);
 }
 ```
 
