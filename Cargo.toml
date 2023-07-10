@@ -9,7 +9,7 @@ members = [
 ]
 
 [features]
-default = ["derive"]
+# default = ["derive"]
 derive = ["jkcenum_derive"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -17,3 +17,6 @@ derive = ["jkcenum_derive"]
 [dependencies]
 jkcenum_derive = { path = "derive", version = "0.1.0", optional = true }
 thiserror = "*"
+
+[dev-dependencies]
+jkcenum_derive = { path = "derive", version = "0.1" }

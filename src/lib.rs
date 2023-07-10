@@ -1,3 +1,11 @@
+#[cfg(feature = "jkcenum_derive")]
+#[allow(unused_imports)]
+#[macro_use]
+extern crate jkcenum_derive;
+
+#[cfg(feature = "jkcenum_derive")]
+pub use jkcenum_derive::JkcEnum;
+
 pub mod errors;
 
 
