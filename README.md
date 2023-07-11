@@ -9,11 +9,18 @@
 
 ## Example
 
+> Cargo.toml
+
+```conf
+[dependencies]
+jkcenum = { git = "https://github.com/caizhengxin/jkcenum.git", features = ["derive"] }
+```
+
 > from_str
 
 ```rust
 use std::str::FromStr;
-use jkcenum_derive::JkcEnum;
+use jkcenum::JkcEnum;
 
 
 
@@ -41,7 +48,7 @@ fn test_fromstr() {
 > from_int
 
 ```rust
-use jkcenum_derive::JkcEnum;
+use jkcenum::JkcEnum;
 use jkcenum::FromInt;
 
 
@@ -74,7 +81,7 @@ fn test_fromint() {
 > to_string
 
 ```rust
-use jkcenum_derive::JkcEnum;
+use jkcenum::JkcEnum;
 
 
 #[derive(Debug, PartialEq, Eq, JkcEnum)]
@@ -95,7 +102,7 @@ fn test_tostring() {
 > to_vec
 
 ```rust
-use jkcenum_derive::JkcEnum;
+use jkcenum::JkcEnum;
 
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, JkcEnum)]
