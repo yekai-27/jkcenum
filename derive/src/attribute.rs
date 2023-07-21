@@ -16,8 +16,10 @@ fn parse_value_string(value: &Literal) -> Result<String> {
 #[derive(Debug)]
 pub struct ContainerAttributes {
     pub crate_name: String,
+    pub is_serde: bool,
     pub lowercase: bool,
     pub uppercase: bool,
+    pub rename_all: Option<String>,
 }
 
 
@@ -25,8 +27,10 @@ impl Default for ContainerAttributes {
     fn default() -> Self {
         Self {
             crate_name: "::".to_string(),
+            is_serde: false,
             lowercase: false,
             uppercase: false,
+            rename_all: None,
         }
     }
 }
@@ -34,12 +38,20 @@ impl Default for ContainerAttributes {
 
 impl FromAttribute for ContainerAttributes {
     fn parse(group: &Group) -> Result<Option<Self>> {
+        let mut result = Self::default();
+
         let attributes = match parse_tagged_attribute(group, "jenum")? {
             Some(body) => body,
-            None => return Ok(None),
+            None => {
+                match parse_tagged_attribute(group, "serde")? {
+                    Some(body) => {
+                        result.is_serde = true;
+                        body
+                    },
+                    None => return Ok(None),
+                }
+            },
         };
-
-        let mut result = Self::default();
 
         for attribute in attributes {
             match attribute {
@@ -48,14 +60,27 @@ impl FromAttribute for ContainerAttributes {
                     match i.to_string().as_str() {
                         "lowercase" => result.lowercase = true,
                         "uppercase" => result.uppercase = true,
-                        _ => return Err(Error::custom_at("Unknown field attribute", i.span())),
+                        _ => {
+                            if !result.is_serde {
+                                return Err(Error::custom_at("Unknown field attribute", i.span()))
+                            }
+                        },
                     }
                 }
-                ParsedAttribute::Property(key, _val) => {
+                ParsedAttribute::Property(key, val) => {
                     // #xxx[xxx=xxx]
                     match key.to_string().as_str() {
+                        "rename_all" => {
+                            match parse_value_string(&val)?.to_string().as_str() {
+                                "lowercase" => result.lowercase = true,
+                                "uppercase" | "UPPERCASE" => result.uppercase = true,
+                                _ => return Err(Error::custom_at("Unknown field attribute", key.span())),
+                            }
+                        },
                         _ => {
-                            return Err(Error::custom_at("Unknown field attribute", key.span()));
+                            if !result.is_serde {
+                                return Err(Error::custom_at("Unknown field attribute", key.span()));
+                            }
                         }
                     }
                 }
@@ -70,6 +95,7 @@ impl FromAttribute for ContainerAttributes {
 
 #[derive(Debug, Default)]
 pub struct FieldAttributes {
+    pub is_serde: bool,
     pub rename: Option<String>,
     pub alias: Vec<String>,
     pub range: Option<String>,
@@ -79,12 +105,20 @@ pub struct FieldAttributes {
 
 impl FromAttribute for FieldAttributes {
     fn parse(group: &Group) -> Result<Option<Self>> {
+        let mut result = Self::default();
+
         let attributes = match parse_tagged_attribute(group, "jenum")? {
             Some(body) => body,
-            None => return Ok(None),
+            None => {
+                match parse_tagged_attribute(group, "serde")? {
+                    Some(body) => {
+                        result.is_serde = true;
+                        body
+                    },
+                    None => return Ok(None),
+                }
+            },
         };
-
-        let mut result = Self::default();
 
         for attribute in attributes {
             match attribute {
@@ -92,7 +126,11 @@ impl FromAttribute for FieldAttributes {
                     // #xxx[xxx]
                     match i.to_string().as_str() {
                         "default" => result.default = true,
-                        _ => return Err(Error::custom_at("Unknown field attribute", i.span())),
+                        _ => {
+                            if !result.is_serde {
+                                return Err(Error::custom_at("Unknown field attribute", i.span()))
+                            }
+                        },
                     }
                 }
                 ParsedAttribute::Property(key, val) => {
@@ -102,7 +140,9 @@ impl FromAttribute for FieldAttributes {
                         "alias" => result.alias.push(val.to_string()),
                         "range" => result.range = Some(parse_value_string(&val)?),
                         _ => {
-                            return Err(Error::custom_at("Unknown field attribute", key.span()));
+                            if !result.is_serde {
+                                return Err(Error::custom_at("Unknown field attribute", key.span()));
+                            }
                         }
                     }
                 }
