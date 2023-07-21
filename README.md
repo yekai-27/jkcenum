@@ -57,7 +57,7 @@ pub enum JkcExample {
     Read = 0x01,
     ReadWrite,
     Write = 0x03,
-    #[jenum(range="4..6")]
+    #[jenum(range="4..=6")]
     Test,
     Test2 = 7,
     #[jenum(default)]
