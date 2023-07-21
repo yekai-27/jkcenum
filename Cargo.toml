@@ -20,3 +20,4 @@ thiserror = "*"
 
 [dev-dependencies]
 jkcenum_derive = { path = "derive", version = "0.1" }
+serde = { version = "*", features = ["derive"] }
