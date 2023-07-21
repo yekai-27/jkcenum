@@ -20,6 +20,22 @@ impl DeriveEnum {
         }
     }
 
+    fn get_field_name(&self, attributes: &FieldAttributes, name: &Ident) -> String {
+        let mut field_name = name.to_string();
+
+        if let Some(name) = &attributes.rename {
+            field_name = name.to_string();
+        }
+        else if self.attributes.lowercase {
+            field_name = field_name.to_lowercase();
+        }
+        else if self.attributes.uppercase {
+            field_name = field_name.to_uppercase();
+        }
+
+        field_name
+    }
+
     pub fn generate_jkcenum(&self, generator: &mut Generator) -> Result<()> {
         self.generate_enum_to_string(generator)?;
         self.generate_enum_from_str(generator)?;
@@ -35,8 +51,6 @@ impl DeriveEnum {
         generator
             .r#impl()
             .generate_fn("to_vec")
-            // .with_self_arg(FnSelfArg::RefSelf)
-            // .with_return_type("String")
             .with_return_type(format!("Vec<{enum_name}>"))
             .make_pub()
             .body(|fn_builder| {
@@ -72,12 +86,7 @@ impl DeriveEnum {
 
                         let attributes = variant.attributes.get_attribute::<FieldAttributes>()?.unwrap_or_default();
 
-                        if let Some(name) = attributes.rename {
-                            variant_case.push_parsed(format!("\"{}\".to_string(),", &name))?;
-                        }
-                        else {
-                            variant_case.push_parsed(format!("\"{}\".to_string(),", &variant.name))?;
-                        }
+                        variant_case.push_parsed(format!("\"{}\".to_string(),", &self.get_field_name(&attributes, &variant.name)))?;
                     }
 
                     Ok(())
@@ -102,12 +111,7 @@ impl DeriveEnum {
                     for (mut _variant_index, variant) in self.iter_fields() {
                         let attributes = variant.attributes.get_attribute::<FieldAttributes>()?.unwrap_or_default();
 
-                        if let Some(name) = attributes.rename {
-                            variant_case.push_parsed(format!("\"{name}\""))?;
-                        }
-                        else {
-                            variant_case.push_parsed(format!("\"{}\"", &variant.name))?;
-                        }
+                        variant_case.push_parsed(format!("\"{}\"", &self.get_field_name(&attributes, &variant.name)))?;
 
                         if !attributes.alias.is_empty() {
                             variant_case.push_parsed(format!(" | {}", attributes.alias.join(" | ")))?;
@@ -148,8 +152,8 @@ impl DeriveEnum {
                             variant_case.push_parsed("_")?;
                             default = true;
                         }
-                        else if let Some((start, end)) = attributes.range {
-                            variant_case.push_parsed(format!("{start}..={end}"))?;
+                        else if let Some(range) = attributes.range {
+                            variant_case.push_parsed(format!("{range}"))?;
                         }
                         else {
                             variant_case.push_parsed(format!("{}", variant_index.to_string().replace("isize", "")))?;

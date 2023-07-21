@@ -16,7 +16,8 @@ fn parse_value_string(value: &Literal) -> Result<String> {
 #[derive(Debug)]
 pub struct ContainerAttributes {
     pub crate_name: String,
-    pub lower: bool,
+    pub lowercase: bool,
+    pub uppercase: bool,
 }
 
 
@@ -24,7 +25,8 @@ impl Default for ContainerAttributes {
     fn default() -> Self {
         Self {
             crate_name: "::".to_string(),
-            lower: false,
+            lowercase: false,
+            uppercase: false,
         }
     }
 }
@@ -32,7 +34,7 @@ impl Default for ContainerAttributes {
 
 impl FromAttribute for ContainerAttributes {
     fn parse(group: &Group) -> Result<Option<Self>> {
-        let attributes = match parse_tagged_attribute(group, "ppe")? {
+        let attributes = match parse_tagged_attribute(group, "jenum")? {
             Some(body) => body,
             None => return Ok(None),
         };
@@ -43,9 +45,9 @@ impl FromAttribute for ContainerAttributes {
             match attribute {
                 ParsedAttribute::Tag(i) => {
                     // // #xxx[xxx]
-
                     match i.to_string().as_str() {
-                        "lower" => result.lower = true,
+                        "lowercase" => result.lowercase = true,
+                        "uppercase" => result.uppercase = true,
                         _ => return Err(Error::custom_at("Unknown field attribute", i.span())),
                     }
                 }
@@ -70,7 +72,7 @@ impl FromAttribute for ContainerAttributes {
 pub struct FieldAttributes {
     pub rename: Option<String>,
     pub alias: Vec<String>,
-    pub range: Option<(usize, usize)>,
+    pub range: Option<String>,
     pub default: bool,
 }
 
@@ -98,18 +100,7 @@ impl FromAttribute for FieldAttributes {
                     match key.to_string().as_str() {
                         "rename" => result.rename = Some(parse_value_string(&val)?),
                         "alias" => result.alias.push(val.to_string()),
-                        "range" => {
-                            let value = parse_value_string(&val)?;
-
-                            let mut v_split = value.split("..");
-
-                            if let Some(v1) = v_split.next() && let Some(v2) = v_split.next() {
-                                result.range = Some((v1.parse::<usize>().unwrap(), v2.parse::<usize>().unwrap()))
-                            }
-                            else {
-                                return Err(Error::custom_at("Unknown field attribute", key.span()));
-                            }
-                        },
+                        "range" => result.range = Some(parse_value_string(&val)?),
                         _ => {
                             return Err(Error::custom_at("Unknown field attribute", key.span()));
                         }
