@@ -99,6 +99,41 @@ fn test_tostring() {
 }
 ```
 
+```rust
+use jkcenum::JkcEnum;
+
+
+#[derive(Debug, PartialEq, Eq, JkcEnum)]
+#[jenum(rename_all="lowercase")]
+enum JkcExample {
+    JanKinCai,
+}
+
+
+#[test]
+fn test_tostring() {
+    assert_eq!(JkcExample::JanKinCai.to_string(), "jankincai");
+}
+```
+
+
+```rust
+use jkcenum::JkcEnum;
+
+
+#[derive(Debug, PartialEq, Eq, JkcEnum)]
+#[jenum(rename_all="desc")]
+enum JkcExample {
+    JanKinCai,
+}
+
+
+#[test]
+fn test_tostring() {
+    assert_eq!(JkcExample::JanKinCai.to_string(), "Jan Kin Cai");
+}
+```
+
 > to_vec
 
 ```rust
