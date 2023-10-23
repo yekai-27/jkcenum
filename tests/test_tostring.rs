@@ -25,3 +25,22 @@ fn test_tostring() {
     assert_eq!(JkcExample2::Read.to_string(), "read");
     assert_eq!(JkcExample2::Write.to_string(), "write");
 }
+
+
+#[derive(Debug, PartialEq, Eq, JkcEnum)]
+#[jenum(rename_all="desc")]
+enum JkcExample3 {
+    JanKinCai,
+    Jkc,
+    Jkc12,
+    JK,
+}
+
+
+#[test]
+fn test_tostring2() {
+    assert_eq!(JkcExample3::JanKinCai.to_string(), "Jan Kin Cai");
+    assert_eq!(JkcExample3::Jkc.to_string(), "Jkc");
+    assert_eq!(JkcExample3::Jkc12.to_string(), "Jkc12");
+    assert_eq!(JkcExample3::JK.to_string(), "J K");
+}

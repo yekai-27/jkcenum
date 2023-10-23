@@ -4,6 +4,36 @@ use virtue::prelude::*;
 use crate::attribute::{ContainerAttributes, FieldAttributes};
 
 
+/// `SnakeCase` to `Snake Case`
+/// 
+/// # Args:
+/// 
+/// - `value`: &str
+/// 
+/// # Returns:
+/// 
+/// - `String`
+/// 
+pub fn snakecase_to_desc(value: &str) -> String {
+    let mut first = 0;
+    let mut vlist = vec![];
+
+    for (i, v) in value.chars().enumerate() {
+        if v >= 'A' && v <= 'Z' {
+            if i > 0 {
+                vlist.push(&value[first..i]);
+            }
+
+            first = i;
+        }
+    }
+
+    vlist.push(&value[first..]);
+
+    vlist.join(" ")
+}
+
+
 #[allow(unused)]
 pub(crate) struct DeriveEnum {
     pub variants: Vec<EnumVariant>,
@@ -31,6 +61,9 @@ impl DeriveEnum {
         }
         else if self.attributes.uppercase {
             field_name = field_name.to_uppercase();
+        }
+        else if self.attributes.desc {
+            field_name = snakecase_to_desc(&field_name);
         }
 
         field_name

@@ -20,6 +20,7 @@ pub struct ContainerAttributes {
     pub lowercase: bool,
     pub uppercase: bool,
     pub rename_all: Option<String>,
+    pub desc: bool, // description, eg: "SnakeCase" to "Snake Case"
 }
 
 
@@ -31,6 +32,7 @@ impl Default for ContainerAttributes {
             lowercase: false,
             uppercase: false,
             rename_all: None,
+            desc: false,
         }
     }
 }
@@ -60,6 +62,7 @@ impl FromAttribute for ContainerAttributes {
                     match i.to_string().as_str() {
                         "lowercase" => result.lowercase = true,
                         "uppercase" => result.uppercase = true,
+                        "desc" => result.uppercase = true,
                         _ => {
                             if !result.is_serde {
                                 return Err(Error::custom_at("Unknown field attribute", i.span()))
@@ -74,6 +77,7 @@ impl FromAttribute for ContainerAttributes {
                             match parse_value_string(&val)?.to_string().as_str() {
                                 "lowercase" => result.lowercase = true,
                                 "uppercase" | "UPPERCASE" => result.uppercase = true,
+                                "desc" => result.desc = true,
                                 _ => return Err(Error::custom_at("Unknown field attribute", key.span())),
                             }
                         },
