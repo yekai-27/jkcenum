@@ -1,7 +1,30 @@
 [package]
 name = "jkcenum_derive"
-version = "0.1.0"
+version = "0.2.0"
+authors = [
+    "jankincai <jankincai12@gmail.com>",
+]
 edition = "2021"
+description = "Rust enum library"
+repository = "https://github.com/caizhengxin/jkcenum"
+readme = "README.md"
+# https://crates.io/category_slugs
+categories = [
+    "accessibility",
+]
+keywords = [
+    "enum",
+    "jkcenum",
+    "jenum",
+]
+license-file = "LICENSE"
+rust-version = "1.73"
+include = [
+    "src/*",
+    "Cargo.toml",
+    "LICENSE*",
+    "README.md",
+]
 
 [lib]
 proc-macro = true
