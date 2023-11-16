@@ -1,5 +1,9 @@
 # JkcEnum
 
+[![Crates.io](https://img.shields.io/crates/v/jkcenum)](https://crates.io/crates/jkcenum)
+[![Crates.io](https://img.shields.io/crates/d/jkcenum)](https://crates.io/crates/jkcenum)
+[![License](https://img.shields.io/crates/l/jkcenum)](LICENSE)
+
 ## Feature
 
 - [x] from_str
