@@ -1,6 +1,6 @@
 [package]
 name = "jkcenum"
-version = "0.1.0"
+version = "0.2.0"
 authors = [
     "jankincai <jankincai12@gmail.com>",
 ]
@@ -46,7 +46,7 @@ opt-level = 1
 overflow-checks = false
 
 [dependencies]
-jkcenum_derive = { path = "derive", version = "0.1.0", optional = true }
+jkcenum_derive = { path = "derive", version = "0.2.0", optional = true }
 thiserror = "*"
 
 [dev-dependencies]
