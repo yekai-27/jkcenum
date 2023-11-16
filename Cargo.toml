@@ -47,8 +47,8 @@ overflow-checks = false
 
 [dependencies]
 jkcenum_derive = { path = "./derive", version = "0.2.0", optional = true }
-thiserror = "*"
+thiserror = "^1.0"
 
 [dev-dependencies]
 jkcenum_derive = { path = "derive", version = "0.2.0" }
-serde = { version = "*", features = ["derive"] }
+serde = { version = "^1.0", features = ["derive"] }
